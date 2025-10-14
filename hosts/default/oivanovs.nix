@@ -1,22 +1,19 @@
-{ pkgs, ... }:
+{ pkgs, lib, config, ... }:
+let
+  inherit (lib) mkMerge mkIf;
+  cfg = config;
+in 
 {
-  users.users.oivanovs = {
-    name = "oivanovs";
-    shell = pkgs.fish;
-    home = "/Users/oivanovs";
-  };
-
-  home-manager.users.oivanovs = {pkgs, ... }: {
-    imports = [
-       ../../modules/home-manager/fish.nix
-     ];
-    
-    home.username = "oivanovs";
-    # home.homeDirectory = "/Users/oivanovs";
-
-    home.stateVersion = "25.05";  
-
-    xdg.enable = true;
-    
-  };
+  config = mkMerge [
+    {
+      users.users.oivanovs = {
+        name = "oivanovs";
+        shell = pkgs.fish;
+        home = "/Users/oivanovs";
+      };
+    }
+    mkIf (cfg ? home-manager.useGlobalPkgs) {
+      home-manager.users.oivanovs = ../../dotfiles/home.nix;
+    }
+  ];
 }

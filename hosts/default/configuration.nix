@@ -19,14 +19,4 @@
   programs.fish.enable = true;
   environment.shells = with pkgs; [ fish ];
   # environment.shells = with pkgs; [ nushell ];
-
-  # Home Manager
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-
-    backupFileExtension = "backup";
-  }; 
-
-  imports = [ ./oivanovs.nix ];
 }
