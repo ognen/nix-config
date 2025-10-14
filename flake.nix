@@ -14,7 +14,7 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs.nixpkgs.follows = "nixpkgs";
-    }
+    };
   };
 
   outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, mac-app-util}:
@@ -25,7 +25,14 @@
       # $ darwin-rebuild changelog
       system.stateVersion = 6;
     };
-    system = "aarch65-darwin";
+    defaultUser = {
+      users.users.oivanovs = {
+        name = "oivanovs";
+        shell = pkgs.fish;
+        home = "/Users/oivanovs";
+      };
+    };
+    system = "aarch64-darwin";
     pkgs = nixpkgs.legacyPackages.${system};
   in 
   {
@@ -36,8 +43,8 @@
         version
         mac-app-util.darwinModules.default
         ./hosts/default/configuration.nix
-        ./hosts/default/oivanovs.nix
-      ]
+        defaultUser
+      ];
     };
 
     #
@@ -57,12 +64,13 @@
             sharedModules = [
               mac-app-util.homeManagerModules.default
             ];
-          }
+            users.oivanovs = ./dotfiles/home.nix;
+          };
         }
         
         # main host configuration
        ./hosts/default/configuration.nix
-       ./hosts/default/oivanovs.nix
+       defaultUser
        ];
     };
 
