@@ -2,12 +2,21 @@
   description = "Ognen's nix-darwin system flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
+
+        # Stable nix-darwin
+    nix-darwin = {
+      url = "https://flakehub.com/f/nix-darwin/nix-darwin/0.1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Determinate module
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "https://flakehub.com/f/nix-community/home-manager/0.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -17,33 +26,22 @@
     };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, mac-app-util}:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, mac-app-util, determinate}:
   let
-    version = {
-      system.configurationRevision = self.rev or self.dirtyRev or null;
-      # Used for backwards compatibility, please read the changelog before changing.
-      # $ darwin-rebuild changelog
-      system.stateVersion = 6;
-    };
-    defaultUser = {
-      users.users.oivanovs = {
-        name = "oivanovs";
-        shell = pkgs.fish;
-        home = "/Users/oivanovs";
-      };
-    };
     system = "aarch64-darwin";
+    username = "oivanovs";
     pkgs = nixpkgs.legacyPackages.${system};
   in 
   {
     # This configuration is for machines where root access is
     # not available w/o intervention.
     darwinConfigurations."no-root" = nix-darwin.lib.darwinSystem {
+      inherit system;
+      
       modules = [
-        version
+        inputs.determinate.darwinModules.default
         mac-app-util.darwinModules.default
-        ./hosts/default/configuration.nix
-        defaultUser
+        self.darwinModules.default
       ];
     };
 
@@ -52,10 +50,13 @@
     # are managed by home-manager 
     #     # $ darwin-rebuild build --flake .#simple
     darwinConfigurations."default" = nix-darwin.lib.darwinSystem {
+      inherit system;
+      
       modules = [
-        version
-        home-manager.darwinModules.home-manager
+        inputs.determinate.darwinModules.default
         mac-app-util.darwinModules.default
+        self.darwinModules.default
+        home-manager.darwinModules.home-manager
         {
           home-manager = {
             useGlobalPkgs = true;
@@ -64,13 +65,9 @@
             sharedModules = [
               mac-app-util.homeManagerModules.default
             ];
-            users.oivanovs = ./dotfiles/home.nix;
+            users.${username} = ./dotfiles/home.nix;
           };
         }
-        
-        # main host configuration
-       ./hosts/default/configuration.nix
-       defaultUser
        ];
     };
 
@@ -87,5 +84,102 @@
       # Optionally use extraSpecialArgs
       # to pass through arguments to home.nix
     };
+
+    darwinModules = {
+      base =
+        {
+          config,
+          pkgs,
+          lib,
+          ...
+        }:
+        {
+          system.configurationRevision = self.rev or self.dirtyRev or null;
+          # Used for backwards compatibility, please read the changelog before changing.
+          # $ darwin-rebuild changelog
+          system.stateVersion = 6;
+        };
+
+        nixConfig =
+          {
+            config,
+            pkg,
+            lib,
+            ...
+          }:
+          {
+            # Let Determinate Nix handle your Nix configuration
+            nix.enable = false;
+
+            # Custom Determinate Nix settings written to /etc/nix/nix.custom.conf
+            determinate-nix.customSettings = {
+              # Enables parallel evaluation (remove this setting or set the value to 1 to disable)
+              eval-cores = 0;
+              extra-experimental-features = [
+                "build-time-fetch-tree" # Enables build-time flake inputs
+                "parallel-eval" # Enables parallel evaluation
+              ];
+              # Other settings
+            };
+          };
+
+        users.oivanovs =
+          {
+            config,
+            pkg,
+            lib,
+            ...
+          }:
+          {
+            users.users.oivanovs = {
+              name = "oivanovs";
+              shell = pkgs.fish;
+              home = "/Users/oivanovs";
+            };
+          };
+
+        default =
+          {
+            config,
+            pkg,
+            lib,
+            ...
+          }:
+          {
+            imports = [
+              self.darwinModules.base
+              self.darwinModules.nixConfig
+              ./hosts/default/configuration.nix
+              self.darwinModules.users.${username}
+            ];
+          };
+    };
+
+    devShells.${system}.default =
+      let
+        pkgs = import inputs.nixpkgs { inherit system; };
+      in
+      pkgs.mkShellNoCC {
+        packages = with pkgs; [
+          # Shell script for applying the nix-darwin configuration.
+          # Run this to apply the configuration in this flake to your macOS system.
+          (writeShellApplication {
+            name = "reload-nix-darwin-configuration";
+            runtimeInputs = [
+              # Make the darwin-rebuild package available in the script
+              inputs.nix-darwin.packages.${system}.darwin-rebuild
+            ];
+            text = ''
+              echo "> Applying nix-darwin configuration..."
+
+              echo "> Running darwin-rebuild switch as root..."
+              sudo darwin-rebuild switch --flake .
+              echo "> darwin-rebuild switch was successful ✅"
+
+              echo "> macOS config was successfully applied 🚀"
+            '';
+          })
+        ];
+      };     
   };
 }

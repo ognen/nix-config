@@ -5,15 +5,12 @@
   environment.systemPackages =
     [ pkgs.vim
       pkgs.helix
-      pkgs.fish
+      # pkgs.fish
       # pkgs.nushell
     ];
 
-  # We're using determinate nix
-  nix.enable = false;
-
-  # The platform the configuration will be used on.
-  nixpkgs.hostPlatform = "aarch64-darwin";
+ # The platform the configuration will be used on.
+  # nixpkgs.hostPlatform = "aarch64-darwin";
 
   # Shells
   programs.fish.enable = true;
