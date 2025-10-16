@@ -48,7 +48,6 @@
     #
     # A few system pacakges are installed and then the rest of them
     # are managed by home-manager 
-    #     # $ darwin-rebuild build --flake .#simple
     darwinConfigurations."default" = nix-darwin.lib.darwinSystem {
       inherit system;
       

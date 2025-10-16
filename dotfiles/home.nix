@@ -10,6 +10,12 @@
 
   xdg.enable = true;
 
+  home.sessionPath = [
+    "$HOME/.local/bin"
+    "/opt/homebrew/bin"
+    "/opt/homebrew/sbin"
+  ];
+
   imports = [
     ./modules/fish/default.nix
   ];
