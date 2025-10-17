@@ -24,12 +24,27 @@
       url = "github:hraban/mac-app-util";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    bash-env-json = {
+      url = "github:tesujimath/bash-env-json/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    bash-env-nushell = {
+      url = "github:tesujimath/bash-env-nushell/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.bash-env-json.follows = "bash-env-json";
+    };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, mac-app-util, determinate}:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, mac-app-util, determinate, ...}:
   let
     system = "aarch64-darwin";
     username = "oivanovs";
+    flakePkgs = {
+      bash-env-json = inputs.bash-env-json.packages.${system}.default;
+      bash-env-nushell = inputs.bash-env-nushell.packages.${system}.default;
+    };
     pkgs = nixpkgs.legacyPackages.${system};
   in 
   {
@@ -80,8 +95,9 @@
         ./dotfiles/home.nix
       ];
 
-      # Optionally use extraSpecialArgs
-      # to pass through arguments to home.nix
+      extraSpecialArgs = {
+        inherit flakePkgs;
+      };
     };
 
     darwinModules = {
