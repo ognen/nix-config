@@ -15,6 +15,7 @@ in
     enable = mkEnableOption "nushell";
   };
   
+  # TODO add help menu, and if posisble llm command assist menu
   config = mkIf cfg.enable {
     programs = {
       nushell = {
@@ -36,6 +37,16 @@ in
 
           reload-hm-session-vars
         '';
+
+        settings = {
+          buffer_editor = "hx";
+          show_banner = false;
+          
+          history = {
+            file_format = "sqlite";
+            max_size = 1000000;
+          };
+        };
       };
     };
   

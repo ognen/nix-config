@@ -15,7 +15,6 @@ in
       programs = {
         direnv.enable = true;
         direnv.enableNushellIntegration = true;
-        direnv.enableFishIntegration = true;
         direnv.nix-direnv.enable = true;
       };
     };
