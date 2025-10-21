@@ -1,4 +1,9 @@
-{ config, pkgs, specialArgs, ... }:
+{
+  config,
+  pkgs,
+  specialArgs,
+  ...
+}:
 let
   inherit (specialArgs) flakePkgs;
 in
@@ -18,6 +23,8 @@ in
     ./modules/direnv.nix
     ./modules/git.nix
     ./modules/fonts/default.nix
+    ./modules/helix.nix
+    ./modules/lang-servers.nix
   ];
 
   # Let Home Manager install and manage itself.
@@ -31,8 +38,10 @@ in
   local.direnv.enable = true;
   local.git.enable = true;
   local.fonts.enable = true;
+  local.helix.enable = true;
+  local.langServers.enable = true;
   programs.ripgrep.enable = true;
-  
+
   # extra use packages
   home.packages = with pkgs; [
     silver-searcher

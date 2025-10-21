@@ -1,6 +1,12 @@
-{ config, specialArgs, pkgs, lib, ... }:
+{
+  config,
+  specialArgs,
+  pkgs,
+  lib,
+  ...
+}:
 let
-   catppuccin-theme = pkgs.fetchFromGitHub {
+  catppuccin-theme = pkgs.fetchFromGitHub {
     owner = "catppuccin";
     repo = "nushell";
     rev = "c0568b4a78f04be24f68c80284755d4635647aa1";
@@ -14,13 +20,13 @@ in
   options.local.nushell = {
     enable = mkEnableOption "nushell";
   };
-  
+
   # TODO add help menu, and if posisble llm command assist menu
   config = mkIf cfg.enable {
     programs = {
       nushell = {
         enable = true;
-      
+
         configFile.source = ./config.nu;
         envFile.source = ./env.nu;
 
@@ -35,13 +41,20 @@ in
             __HM_SESS_VARS_SOURCED="" bash-env ~/.nix-profile/etc/profile.d/hm-session-vars.sh | load-env
           }
 
+          # A helper to convert to nix attrsets
+          def "to nix" [] {
+            to json
+            | nix eval --impure --pretty --expr '(builtins.fromJSON (builtins.readFile /dev/stdin))'
+            | ${pkgs.nixfmt}/bin/nixfmt
+
+          }
           reload-hm-session-vars
         '';
 
         settings = {
           buffer_editor = "hx";
           show_banner = false;
-          
+
           history = {
             file_format = "sqlite";
             max_size = 1000000;
@@ -49,7 +62,7 @@ in
         };
       };
     };
-  
+
     home.packages = [
       flakePkgs.bash-env-nushell
       pkgs.jc

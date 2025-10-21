@@ -1,2 +1,1 @@
-# the nushell config file
 
