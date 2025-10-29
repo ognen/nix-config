@@ -24,8 +24,12 @@ in
     ./modules/git.nix
     ./modules/fonts/default.nix
     ./modules/helix.nix
-    ./modules/lang-servers.nix
+    ./modules/emacs/default.nix
+    ./modules/lang-servers/default.nix
   ];
+
+  # allow unree
+  nixpkgs.config.allowUnfree = true;
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
@@ -39,7 +43,9 @@ in
   local.git.enable = true;
   local.fonts.enable = true;
   local.helix.enable = true;
+  local.emacs.enable = true;
   local.langServers.enable = true;
+  local.langServers.flakePath = ../.;
   programs.ripgrep.enable = true;
 
   # extra use packages
@@ -49,6 +55,7 @@ in
     nix-tree
     bat
     flakePkgs.fh
+    claude-code
   ];
 
   home.sessionPath = [
