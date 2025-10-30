@@ -64,13 +64,11 @@ in
     })
 
     (mkIf (customizations != [ ]) {
-      xdg.configFile = {
-        "emacs/custom-from-nix-home-manager.el".text = ''
-          (custom-set-variables
-            ${(lib.concatStringsSep "\n  " customizations)}
-          )
-        '';
-      };
+      programs.emacs.extraConfig = ''
+        (custom-set-variables
+          ${(lib.concatStringsSep "\n  " customizations)}
+        )
+      '';
     })
   ];
 }
