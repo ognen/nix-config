@@ -32,6 +32,13 @@ let
   };
 
   helixConfig = import ./helix-config.nix { inherit package lib langServers; };
+  emacsCustomizations = lib.foldl (
+    customizations: lsc:
+    if lsc ? emacsCustomizations then
+      (lib.mergeAttrs customizations lsc.emacsCustomizations)
+    else
+      customizations
+  ) { } (builtins.attrValues langServers);
 
 in
 {
@@ -63,6 +70,8 @@ in
     # lsp-mode is good at picking up defaults
     (mkIf cfg.enableEmacsIntegration {
       home.packages = [ package ];
+
+      local.emacs.customizations = emacsCustomizations;
     })
   ];
 }

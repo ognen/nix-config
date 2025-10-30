@@ -7,7 +7,7 @@ let
   formatter = pkgs.nixfmt;
   flake = "(builtins.getFlake ${flakePath})";
 in
-{
+rec {
   packages = [
     pkg
     formatter
@@ -22,5 +22,11 @@ in
       nixos.expr = "${flake}.inputs.darwinConfigurations.default.options";
       home-manager.expr = "${flake}.homeConfigurations.default.options";
     };
+  };
+
+  emacsCustomizations = {
+    lsp-nix-nixd-nixpkgs-expr = config.nixpkgs.expr;
+    lsp-nix-nixd-nixos-options-expr = config.options.nixos.expr;
+    lsp-nix-nixd-home-manager-options-expr = config.options.home-manager.expr;
   };
 }
