@@ -14,7 +14,9 @@ let
   };
   inherit (lib) mkEnableOption mkIf mkMerge;
   cfg = config.local.nushell;
-  inherit (specialArgs) flakePkgs;
+  inherit (specialArgs) flakePkgs systemEnvironment;
+  path = config.home.sessionPath ++ (lib.strings.splitString ":" systemEnvironment.systemPath);
+  inherit (lib.hm.nushell) toNushell;
 in
 {
   options.local.nushell = {
@@ -27,28 +29,24 @@ in
       nushell = {
         enable = true;
 
-        configFile.source = ./config.nu;
-        envFile.source = ./env.nu;
+        # configFile.source = ./config.nu;
+        # envFile.source = ./env.nu;
+
+        environmentVariables = mkMerge [
+          (lib.mkDefault systemEnvironment.variables)
+          config.home.sessionVariables
+        ];
 
         extraConfig = ''
           # selected theme 
           source "${catppuccin-theme}/themes/catppuccin_mocha.nu";
 
-          use "${flakePkgs.bash-env-nushell}/bash-env.nu"
-
-          def --env "reload-hm-session-vars" [] {
-            __ETC_PROFILE_NIX_SOURCED="" bash-env  /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh | load-env
-            __HM_SESS_VARS_SOURCED="" bash-env ~/.nix-profile/etc/profile.d/hm-session-vars.sh | load-env
+          if $env not-has "__LOCAL_HM_SESS_VARS_SOURCED" {
+            load-env {
+              PATH: ${toNushell { } path}
+              __LOCAL_HM_SESS_VARS_SOURCED: 1
+            }
           }
-
-          # A helper to convert to nix attrsets
-          def "to nix" [] {
-            to json
-            | nix eval --impure --pretty --expr '(builtins.fromJSON (builtins.readFile /dev/stdin))'
-            | ${pkgs.nixfmt}/bin/nixfmt
-
-          }
-          reload-hm-session-vars
         '';
 
         settings = {

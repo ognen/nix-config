@@ -118,6 +118,7 @@
 
         extraSpecialArgs = {
           inherit flakePkgs;
+          systemEnvironment = self.darwinConfigurations.no-root.config.environment;
         };
       };
 
