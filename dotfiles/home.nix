@@ -59,7 +59,7 @@ in
   ];
 
   home.sessionPath = [
-    "$HOME/.local/bin"
+    "${config.home.homeDirectory}/.local/bin"
     "/opt/homebrew/bin"
     "/opt/homebrew/sbin"
   ];

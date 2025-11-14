@@ -32,6 +32,7 @@ let
   };
 
   helixConfig = import ./helix-config.nix { inherit package lib langServers; };
+
   emacsCustomizations = lib.foldl (
     customizations: lsc:
     if lsc ? emacsCustomizations then
@@ -39,6 +40,10 @@ let
     else
       customizations
   ) { } (builtins.attrValues langServers);
+
+  emacsConfiguraiton = lib.foldl (
+    config: lsc: if lsc ? emacsConfiguration then config + "\n" + lsc.emacsConfiguration else config
+  ) "" (builtins.attrValues langServers);
 
 in
 {
@@ -68,10 +73,11 @@ in
     (mkIf (cfg.enableHelixIntegration) helixConfig)
     # For emacs, we're just exposing the language servers in the environmengt as
     # lsp-mode is good at picking up defaults
-    (mkIf cfg.enableEmacsIntegration {
+    (mkIf (cfg.enableEmacsIntegration) {
       home.packages = [ package ];
 
       local.emacs.customizations = emacsCustomizations;
+      local.emacs.configuration = emacsConfiguraiton;
     })
   ];
 }

@@ -15,7 +15,10 @@ let
   inherit (lib) mkEnableOption mkIf mkMerge;
   cfg = config.local.nushell;
   inherit (specialArgs) flakePkgs systemEnvironment;
-  path = config.home.sessionPath ++ (lib.strings.splitString ":" systemEnvironment.systemPath);
+  actualSystemPath =
+    builtins.replaceStrings [ "$HOME" ] [ config.home.homeDirectory ]
+      systemEnvironment.systemPath;
+  path = config.home.sessionPath ++ (lib.strings.splitString ":" actualSystemPath);
   inherit (lib.hm.nushell) toNushell;
 in
 {
@@ -28,9 +31,6 @@ in
     programs = {
       nushell = {
         enable = true;
-
-        # configFile.source = ./config.nu;
-        # envFile.source = ./env.nu;
 
         environmentVariables = mkMerge [
           (lib.mkDefault systemEnvironment.variables)

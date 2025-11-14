@@ -40,6 +40,13 @@ in
       type = lib.types.attrsOf lib.types.anything;
       description = "attribute-value pairs that end up as (customize-set-variables) in a config file cusom-from-nix-home-manager.el";
     };
+
+    configuration = lib.mkOption {
+      type = lib.types.lines;
+      default = "";
+      description = "Extra Emacs Configuration";
+    };
+
   };
 
   config = mkMerge [
@@ -68,7 +75,8 @@ in
         (custom-set-variables
           ${(lib.concatStringsSep "\n  " customizations)}
         )
-      '';
+      ''
+      + cfg.configuration;
     })
   ];
 }
