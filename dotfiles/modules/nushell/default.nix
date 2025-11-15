@@ -14,7 +14,7 @@ let
   };
   inherit (lib) mkEnableOption mkIf mkMerge;
   cfg = config.local.nushell;
-  inherit (specialArgs) flakePkgs systemEnvironment;
+  inherit (specialArgs) systemEnvironment;
   actualSystemPath =
     builtins.replaceStrings [ "$HOME" ] [ config.home.homeDirectory ]
       systemEnvironment.systemPath;
@@ -62,7 +62,6 @@ in
     };
 
     home.packages = [
-      flakePkgs.bash-env-nushell
       pkgs.jc
     ];
   };

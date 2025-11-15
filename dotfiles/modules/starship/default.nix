@@ -26,5 +26,10 @@ in
       enable = true;
       enableNushellIntegration = true;
     };
+
+    programs.vivid = {
+      enable = true;
+      activeTheme = "catppuccin-mocha";
+    };
   };
 }

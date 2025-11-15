@@ -20,22 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    mac-app-util = {
-      url = "github:hraban/mac-app-util";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    bash-env-json = {
-      url = "github:tesujimath/bash-env-json/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    bash-env-nushell = {
-      url = "github:tesujimath/bash-env-nushell/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.bash-env-json.follows = "bash-env-json";
-    };
-
     fh = {
       url = "https://flakehub.com/f/DeterminateSystems/fh/*";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -53,7 +37,6 @@
       nix-darwin,
       nixpkgs,
       home-manager,
-      mac-app-util,
       determinate,
       ...
     }:
@@ -61,8 +44,6 @@
       system = "aarch64-darwin";
       username = "oivanovs";
       flakePkgs = {
-        bash-env-json = inputs.bash-env-json.packages.${system}.default;
-        bash-env-nushell = inputs.bash-env-nushell.packages.${system}.default;
         fh = inputs.fh.packages.${system}.default;
         tx-02-font = inputs.private-fonts.packages.${system}.TX-02;
       };
@@ -76,7 +57,6 @@
 
         modules = [
           inputs.determinate.darwinModules.default
-          mac-app-util.darwinModules.default
           self.darwinModules.default
         ];
       };
@@ -89,7 +69,6 @@
 
         modules = [
           inputs.determinate.darwinModules.default
-          mac-app-util.darwinModules.default
           self.darwinModules.default
           home-manager.darwinModules.home-manager
           {
@@ -97,9 +76,6 @@
               useGlobalPkgs = true;
               useUserPackages = true;
               backupFileExtension = "backup";
-              sharedModules = [
-                mac-app-util.homeManagerModules.default
-              ];
               users.${username} = ./dotfiles/home.nix;
             };
           }
@@ -112,7 +88,6 @@
         inherit pkgs;
 
         modules = [
-          mac-app-util.homeManagerModules.default
           ./dotfiles/home.nix
         ];
 
