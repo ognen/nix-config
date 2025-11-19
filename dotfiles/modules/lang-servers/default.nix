@@ -9,7 +9,7 @@ let
   inherit (cfg) flakePath;
   inherit (lib) mkEnableOption mkMerge mkIf;
   langServers = {
-    nixd = import ./nixd.nix { inherit pkgs flakePath; };
+    nixd = import ./nixd.nix { inherit pkgs flakePath lib; };
     efm = import ./efm.nix { inherit pkgs; };
     json = import ./json.nix { inherit pkgs; };
     tailwind = import ./tailwind.nix { inherit pkgs; };

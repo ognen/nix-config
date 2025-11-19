@@ -1,8 +1,10 @@
 {
   pkgs,
+  lib,
   flakePath,
 }:
 let
+  libEmacs = import ../../../lib/emacs.nix { inherit lib; };
   pkg = pkgs.nixd;
   formatter = pkgs.nixfmt;
   flake = "(builtins.getFlake ${flakePath})";
@@ -29,4 +31,12 @@ rec {
     lsp-nix-nixd-nixos-options-expr = config.options.nixos.expr;
     lsp-nix-nixd-home-manager-options-expr = config.options.home-manager.expr;
   };
+
+  emacsConfiguration = ''
+    (with-eval-after-load 'eglot
+      (add-to-list 'eglot-server-programs
+        '((nix-mode nix-ts-mode)
+          . ("${command}"
+             :initializationOptions ${libEmacs.toEmacsPlist config}))))
+  '';
 }
