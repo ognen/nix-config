@@ -26,6 +26,7 @@ in
     ./modules/helix.nix
     ./modules/emacs/default.nix
     ./modules/lang-servers/default.nix
+    ./modules/clojure.nix
   ];
 
   # allow unree
@@ -47,6 +48,8 @@ in
   local.langServers.enable = true;
   local.langServers.flakePath = ../.;
   programs.ripgrep.enable = true;
+
+  local.clojure.enable = true;
 
   # extra use packages
   home.packages = with pkgs; [
