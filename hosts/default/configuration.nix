@@ -1,18 +1,20 @@
 { pkgs, ... }:
 {
+  imports = [ ../../common/modules/nushell/default.nix ];
+
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages =
-    [ pkgs.vim
-      pkgs.helix
-      pkgs.nushell
-      # pkgs.fish
-      # pkgs.nushell
-    ];
+  environment.systemPackages = [
+    pkgs.vim
+    pkgs.helix
+  ];
 
   # Shells
+  local.nushell.enable = true;
   programs.fish.enable = true;
   programs.bash.enable = true;
-  # programs.nushell.enable = true;
-  environment.shells = with pkgs; [ fish nushell ];
+
+  environment.shells = with pkgs; [
+    fish
+  ];
 }

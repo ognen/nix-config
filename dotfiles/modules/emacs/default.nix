@@ -68,6 +68,14 @@ in
           epkgs.treesit-grammars.with-all-grammars
         ];
       };
+
+      programs.nushell.shellAliases = {
+        ec = "emacsclient -n";
+      };
+
+      home.shellAliases = {
+        ec = "emacsclient -n";
+      };
     })
 
     (mkIf (customizations != [ ]) {

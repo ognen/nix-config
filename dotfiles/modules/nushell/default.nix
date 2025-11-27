@@ -1,6 +1,5 @@
 {
   config,
-  specialArgs,
   pkgs,
   lib,
   ...
@@ -14,11 +13,6 @@ let
   };
   inherit (lib) mkEnableOption mkIf mkMerge;
   cfg = config.local.nushell;
-  inherit (specialArgs) systemEnvironment;
-  actualSystemPath =
-    builtins.replaceStrings [ "$HOME" ] [ config.home.homeDirectory ]
-      systemEnvironment.systemPath;
-  path = config.home.sessionPath ++ (lib.strings.splitString ":" actualSystemPath);
   inherit (lib.hm.nushell) toNushell;
 in
 {
@@ -33,20 +27,25 @@ in
         enable = true;
 
         environmentVariables = mkMerge [
-          (lib.mkDefault systemEnvironment.variables)
           config.home.sessionVariables
         ];
 
+        extraEnv = ''
+          if ('/etc/nushell/nix-env.nu' | path exists) {
+            source /etc/nushell/nix-env.nu
+          }
+        '';
+
         extraConfig = ''
+          use std/util 'path add'
+          let sessionPath = ${toNushell { } config.home.sessionPath};
+
+          if ($sessionPath | is-not-empty) {
+            path add ...$sessionPath
+          }
+
           # selected theme 
           source "${catppuccin-theme}/themes/catppuccin_mocha.nu";
-
-          if $env not-has "__LOCAL_HM_SESS_VARS_SOURCED" {
-            load-env {
-              PATH: ${toNushell { } path}
-              __LOCAL_HM_SESS_VARS_SOURCED: 1
-            }
-          }
         '';
 
         settings = {

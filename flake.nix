@@ -93,7 +93,6 @@
 
         extraSpecialArgs = {
           inherit flakePkgs;
-          systemEnvironment = self.darwinConfigurations.no-root.config.environment;
         };
       };
 
@@ -145,7 +144,7 @@
           {
             users.users.oivanovs = {
               name = "oivanovs";
-              shell = pkgs.fish;
+              shell = pkgs.nushell;
               home = "/Users/oivanovs";
             };
           };
