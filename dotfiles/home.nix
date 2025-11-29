@@ -59,6 +59,8 @@ in
     bat
     # flakePkgs.fh
     claude-code
+    awscli2
+    awsume
   ];
 
   home.sessionPath = [
