@@ -57,7 +57,7 @@ in
     hunspell
     nix-tree
     bat
-    flakePkgs.fh
+    # flakePkgs.fh
     claude-code
   ];
 

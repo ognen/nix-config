@@ -20,10 +20,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    fh = {
-      url = "https://flakehub.com/f/DeterminateSystems/fh/*";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # fh = {
+    #   url = "https://flakehub.com/f/DeterminateSystems/fh/*";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     private-fonts = {
       url = "https://flakehub.com/f/ognen/fonts/0.1";
@@ -44,7 +44,7 @@
       system = "aarch64-darwin";
       username = "oivanovs";
       flakePkgs = {
-        fh = inputs.fh.packages.${system}.default;
+        # fh = inputs.fh.packages.${system}.default;
         tx-02-font = inputs.private-fonts.packages.${system}.TX-02;
       };
       pkgs = nixpkgs.legacyPackages.${system};
