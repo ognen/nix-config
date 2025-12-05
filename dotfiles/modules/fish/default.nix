@@ -1,4 +1,9 @@
-{pkgs, lib, config, ...}:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   catppuccin-fish = pkgs.fetchFromGitHub {
     owner = "catppuccin";
@@ -15,8 +20,8 @@ let
     else
       themeList
   ) [ ] cfg.plugins;
-in 
- {
+in
+{
   programs.fish = {
     enable = true;
 
@@ -33,7 +38,7 @@ in
   };
 
   # hack to enable themes from fish plugins unitil it is available upstram
-  xdg.configFile = lib.mkMerge(
+  xdg.configFile = lib.mkMerge (
     map (
       theme:
       let
@@ -44,9 +49,5 @@ in
       }
     ) themes
   );
-
-  
-
   # TODO add the theme links manually as it's not currently supported
-  
 }
