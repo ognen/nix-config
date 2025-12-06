@@ -70,6 +70,7 @@ in
           success_symbol = "[❯❯❯](bold fg:green)";
           error_symbol = "[❯❯❯](bold fg:red)";
         };
+        cmd_duration.show_notifications = false;
       };
     };
 

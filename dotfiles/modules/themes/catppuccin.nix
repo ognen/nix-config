@@ -25,15 +25,8 @@ let
   themedStarshipSettings = palette: {
     preset = "catppuccin-powerline";
 
-    extraSettings = {
+    extraSettings = config.local.starship.settings.extraSettings or { } // {
       palette = palette;
-      line_break = {
-        disabled = false;
-      };
-      character = {
-        success_symbol = "[❯❯❯](bold fg:green)";
-        error_symbol = "[❯❯❯](bold fg:red)";
-      };
     };
   };
 in
@@ -50,6 +43,14 @@ in
         ${darkTheme} = themedStarshipSettings (toSnakeCase darkTheme);
       };
     })
+
+    # Helix; uncomment this once the next version is released
+    # (mkIf (config.local.helix.enable && (isCatppuccin lightTheme)) {
+    #   programs.helix.settings.theme.light = (toSnakeCase lightTheme);
+    # })
+    # (mkIf (config.local.helix.enable && (isCatppuccin darkTheme)) {
+    #   programs.helix.settings.theme.dark = (toSnakeCase darkTheme);
+    # })
 
     # Nushell
     (mkIf (config.local.nushell.enable) {
