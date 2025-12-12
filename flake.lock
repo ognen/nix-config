@@ -1,5 +1,19 @@
 {
   "nodes": {
+    "crane": {
+      "locked": {
+        "lastModified": 1758758545,
+        "narHash": "sha256-NU5WaEdfwF6i8faJ2Yh+jcK9vVFrofLcwlD/mP65JrI=",
+        "rev": "95d528a5f54eaba0d12102249ce42f4d01f4e364",
+        "revCount": 764,
+        "type": "tarball",
+        "url": "https://api.flakehub.com/f/pinned/ipetkov/crane/0.21.1/01997e40-19a9-7bc6-9dba-0585d6ed9a98/source.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://flakehub.com/f/ipetkov/crane/0"
+      }
+    },
     "determinate": {
       "inputs": {
         "determinate-nixd-aarch64-darwin": "determinate-nixd-aarch64-darwin",
@@ -57,6 +71,49 @@
       "original": {
         "type": "file",
         "url": "https://install.determinate.systems/determinate-nixd/tag/v3.14.0/x86_64-linux"
+      }
+    },
+    "fenix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-analyzer-src": "rust-analyzer-src"
+      },
+      "locked": {
+        "lastModified": 1764571808,
+        "narHash": "sha256-+oo9W5rz03TjfpNqDSLEQwgKiuBbjrHdORyTHli2RuM=",
+        "rev": "df3c2e78ec13418f85c1f26e77a50f865ec57d38",
+        "revCount": 2471,
+        "type": "tarball",
+        "url": "https://api.flakehub.com/f/pinned/nix-community/fenix/0.1.2471%2Brev-df3c2e78ec13418f85c1f26e77a50f865ec57d38/019ad905-65fc-7ba6-8d92-a0b2cf1c6ea6/source.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://flakehub.com/f/nix-community/fenix/0.1"
+      }
+    },
+    "fh": {
+      "inputs": {
+        "crane": "crane",
+        "fenix": [
+          "fenix"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1761780713,
+        "narHash": "sha256-EUCV7/J9wJRroCGW5JqonFJIqcvJEBAwB7l3eWYxiSk=",
+        "rev": "4f001f2e1de4776f01cf22d1de815f1016a4c4c9",
+        "revCount": 786,
+        "type": "tarball",
+        "url": "https://api.flakehub.com/f/pinned/DeterminateSystems/fh/0.1.27/019a355b-4c74-769d-a9ad-232df447089d/source.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://flakehub.com/f/DeterminateSystems/fh/%2A"
       }
     },
     "flake-compat": {
@@ -263,10 +320,29 @@
     "root": {
       "inputs": {
         "determinate": "determinate",
+        "fenix": "fenix",
+        "fh": "fh",
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs_2",
         "private-fonts": "private-fonts"
+      }
+    },
+    "rust-analyzer-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1764525349,
+        "narHash": "sha256-vR3vU9AwzMsBvjNeeG2inA5W/2MwseFk5NIIrLFEMHk=",
+        "owner": "rust-lang",
+        "repo": "rust-analyzer",
+        "rev": "d646b23f000d099d845f999c2c1e05b15d9cdc78",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rust-lang",
+        "ref": "nightly",
+        "repo": "rust-analyzer",
+        "type": "github"
       }
     }
   },

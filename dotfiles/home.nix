@@ -4,9 +4,6 @@
   specialArgs,
   ...
 }:
-let
-  inherit (specialArgs) flakePkgs;
-in
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -63,7 +60,7 @@ in
     hunspell
     nix-tree
     bat
-    # flakePkgs.fh
+    # fh
     claude-code
     awscli2
     awsume

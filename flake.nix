@@ -20,10 +20,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # fh = {
-    #   url = "https://flakehub.com/f/DeterminateSystems/fh/*";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    # currently it doesn't build because of nixel
+    fenix = {
+      url = "https://flakehub.com/f/nix-community/fenix/0.1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    fh = {
+      url = "https://flakehub.com/f/DeterminateSystems/fh/*";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.fenix.follows = "fenix";
+    };
 
     private-fonts = {
       url = "https://flakehub.com/f/ognen/fonts/0.1";
@@ -37,23 +44,31 @@
       nix-darwin,
       nixpkgs,
       home-manager,
-      determinate,
       ...
     }:
     let
       system = "aarch64-darwin";
       username = "oivanovs";
-      flakePkgs = {
-        # fh = inputs.fh.packages.${system}.default;
-        tx-02-font = inputs.private-fonts.packages.${system}.TX-02;
+
+      # The flake's pkgs instance
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+
+        overlays = [
+          inputs.fh.overlays.default
+
+          (final: prev: {
+            tx-02-font = inputs.private-fonts.packages.${system}.TX-02;
+          })
+        ];
       };
-      pkgs = nixpkgs.legacyPackages.${system};
     in
     {
       # This configuration is for machines where root access is
       # not available w/o intervention.
       darwinConfigurations."no-root" = nix-darwin.lib.darwinSystem {
-        inherit system;
+        inherit system pkgs;
 
         modules = [
           inputs.determinate.darwinModules.default
@@ -65,7 +80,7 @@
       # A few system pacakges are installed and then the rest of them
       # are managed by home-manager
       darwinConfigurations."default" = nix-darwin.lib.darwinSystem {
-        inherit system;
+        inherit system pkgs;
 
         modules = [
           inputs.determinate.darwinModules.default
@@ -90,10 +105,6 @@
         modules = [
           ./dotfiles/home.nix
         ];
-
-        extraSpecialArgs = {
-          inherit flakePkgs;
-        };
       };
 
       darwinModules = {
