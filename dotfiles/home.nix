@@ -14,17 +14,18 @@
   # TODO hunspell emacs fonts (maocs defaults config, e.g. kbd repeat etc, )
   imports = [
     ./modules/xdg-darwin.nix
-    ./modules/fish/default.nix
-    ./modules/nushell/default.nix
-    ./modules/starship/default.nix
+    ./modules/fish
+    ./modules/nushell
+    ./modules/starship
     ./modules/direnv.nix
     ./modules/git.nix
-    ./modules/fonts/default.nix
+    ./modules/fonts
     ./modules/helix.nix
-    ./modules/emacs/default.nix
-    ./modules/lang-servers/default.nix
+    ./modules/emacs
+    ./modules/lang-servers
     ./modules/clojure.nix
-    ./modules/themes/default.nix
+    ./modules/themes
+    ./modules/claude
   ];
 
   # allow unree
@@ -47,6 +48,7 @@
   local.langServers.flakePath = ../.;
   programs.ripgrep.enable = true;
   local.clojure.enable = true;
+  local.claude.enable = true;
 
   # Themes
   local.themes = {
@@ -61,7 +63,6 @@
     nix-tree
     bat
     # fh
-    claude-code
     awscli2
     awsume
   ];
