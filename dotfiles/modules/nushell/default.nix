@@ -14,15 +14,11 @@ let
     ;
   cfg = config.local.nushell;
   inherit (lib.hm.nushell) toNushell;
-  modulePath = "nushell/modules";
 
-  # Takes either a package or a path and returns a path under modulePath
-  moduleTarget =
-    m:
-    let
-      name = if lib.isDerivation m then m.pname or m.name else builtins.baseNameOf m;
-    in
-    "${modulePath}/${name}";
+  # Create a simple nushell module package for macos-appearance
+  macosAppearanceModule = pkgs.writeTextDir "share/nushell/macos-appearance.nu" (
+    builtins.readFile ./macos-appearance.nu
+  );
 
 in
 {
@@ -30,9 +26,13 @@ in
     enable = mkEnableOption "nushell";
 
     modules = mkOption {
-      type = types.listOf (types.either types.package types.path);
+      type = types.listOf types.package;
       default = [ ];
-      description = "List of modules, each being either a package or a path to a file.";
+      description = ''
+        List of packages providing nushell modules.
+        Each package is expected to provide module files in share/nushell,
+        typically as share/nushell/module.nu or share/nushell/module/mod.nu.
+      '';
     };
 
     themes = mkOption {
@@ -57,7 +57,7 @@ in
   config = mkIf cfg.enable (mkMerge [
     {
       local.nushell.modules = [
-        ./macos-appearance.nu
+        macosAppearanceModule
       ];
 
       programs = {
@@ -98,24 +98,19 @@ in
 
       home.packages = [
         pkgs.jc
-      ];
+      ]
+      ++ cfg.modules;
     }
-    ## Setup modules
-    (mkIf (cfg.modules != [ ]) {
-      xdg.dataFile = builtins.listToAttrs (
-        map (m: {
-          name = moduleTarget m;
-          value = {
-            source = m;
-          };
-        }) cfg.modules
-      );
-
+    ## Setup NU_LIB_DIRS to include standard data directories
+    {
       programs.nushell.extraEnv = ''
-        $env.NU_LIB_DIRS = $env.NU_LIB_DIRS | default [] | append ${
-          toNushell { } "${config.xdg.dataHome}/${modulePath}"
-        }
+        let xdg_data_paths = ($env.XDG_DATA_DIRS? | default "" | split row ":" | where $it != "" | each {|d| $"($d)/nushell"})
+        let new_paths = [
+          ${toNushell { } "${config.xdg.dataHome}/nushell"}
+        ] | append $xdg_data_paths
+        let existing = $env.NU_LIB_DIRS | default []
+        $env.NU_LIB_DIRS = ($new_paths | where {|p| $p not-in $existing}) | append $existing
       '';
-    })
+    }
   ]);
 }
