@@ -8,6 +8,8 @@ let
   cfg = config.local.nushell;
   setEnvironment = config.system.build.setEnvironment;
   inherit (lib) mkIf mkEnableOption;
+
+  captureEnv = pkgs.writeTextDir "share/nushell/capture-env.nu" (builtins.readFile ./capture-env.nu);
 in
 {
   options.local.nushell = {
@@ -22,9 +24,7 @@ in
     environment.shells = [ pkgs.nushell ];
 
     environment.etc = {
-      "nushell/capture-env.nu".source = pkgs.writeText "capture-env.nu" (
-        builtins.readFile ./capture-env.nu
-      );
+      "nushell/capture-env.nu".source = "${captureEnv}/share/nushell/capture-env.nu";
       "nushell/nix-env.nu".text = ''
         use /etc/nushell/capture-env.nu
 
