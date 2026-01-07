@@ -65,6 +65,7 @@
     # fh
     awscli2
     awsume
+    skopeo
   ];
 
   home.sessionPath = [
