@@ -20,12 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # currently it doesn't build because of nixel
-    fenix = {
-      url = "https://flakehub.com/f/nix-community/fenix/0.1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*";
 
     private-fonts = {
