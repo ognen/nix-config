@@ -26,11 +26,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    fh = {
-      url = "https://flakehub.com/f/DeterminateSystems/fh/*";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.fenix.follows = "fenix";
-    };
+    fh.url = "https://flakehub.com/f/DeterminateSystems/fh/*";
 
     private-fonts = {
       url = "https://flakehub.com/f/ognen/fonts/0.1";
