@@ -62,6 +62,7 @@
     hunspell
     nix-tree
     bat
+    pdftk
     # fh
     awscli2
     awsume
