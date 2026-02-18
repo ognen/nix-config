@@ -26,6 +26,7 @@
     ./modules/clojure.nix
     ./modules/themes
     ./modules/claude
+    ./modules/granted
   ];
 
   # allow unree
@@ -49,6 +50,7 @@
   programs.ripgrep.enable = true;
   local.clojure.enable = true;
   local.claude.enable = true;
+  local.granted.enable = true;
 
   # Themes
   local.themes = {
@@ -65,7 +67,7 @@
     pdftk
     # fh
     awscli2
-    awsume
+    aws-sso-util
     skopeo
   ];
 
