@@ -18,7 +18,7 @@ in
 
       settings = {
         user.name = "Ognen Ivanovski";
-        user.email = "ognen.ivanovski@netcetera.com";
+        user.email = "ognen.ivanovski@forward-publishing.com";
 
         core = {
           eol = "native";
