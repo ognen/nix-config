@@ -69,6 +69,9 @@
     awscli2
     aws-sso-util
     skopeo
+    proton-pass-cli
+    poppler
+    graphviz
   ];
 
   home.sessionPath = [
