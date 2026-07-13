@@ -27,6 +27,7 @@
     ./modules/themes
     ./modules/claude
     ./modules/granted
+    ./modules/docker
   ];
 
   # allow unree
@@ -51,6 +52,7 @@
   local.clojure.enable = true;
   local.claude.enable = true;
   local.granted.enable = true;
+  local.docker.enable = true;
 
   # Themes
   local.themes = {
