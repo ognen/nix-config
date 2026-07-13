@@ -60,11 +60,12 @@
 
   # extra use packages
   home.packages = with pkgs; [
-    silver-searcher
+    # silver-searcher
     hunspell
     nix-tree
     bat
     pdftk
+    rustup
     # fh
     awscli2
     aws-sso-util
