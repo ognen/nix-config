@@ -17,6 +17,11 @@ in
     programs.docker-cli.enable = true;
 
     services.colima.enable = true;
+
+    home.packages = with pkgs; [
+      docker-client
+      docker-compose
+    ];
   };
 
 }

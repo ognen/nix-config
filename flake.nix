@@ -26,6 +26,11 @@
       url = "https://flakehub.com/f/ognen/fonts/0.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -47,6 +52,7 @@
 
         overlays = [
           inputs.fh.overlays.default
+          inputs.llm-agents.overlays.shared-nixpkgs
 
           (final: prev: {
             tx-02-font = inputs.private-fonts.packages.${system}.TX-02;
@@ -135,7 +141,11 @@
                   "build-time-fetch-tree" # Enables build-time flake inputs
                   "parallel-eval" # Enables parallel evaluation
                 ];
-                # Other settings
+                # llm-agents.nix binary cache (pi and other AI coding agents)
+                extra-substituters = [ "https://cache.numtide.com" ];
+                extra-trusted-public-keys = [
+                  "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+                ];
               };
             };
           };

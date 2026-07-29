@@ -9,7 +9,7 @@
   # manage.
   home.username = "oivanovs";
   home.homeDirectory = "/Users/oivanovs";
-  home.stateVersion = "25.05"; # Please read the comment before changing.
+  home.stateVersion = "26.05"; # Please read the comment before changing.
 
   # TODO hunspell emacs fonts (maocs defaults config, e.g. kbd repeat etc, )
   imports = [
@@ -26,6 +26,7 @@
     ./modules/clojure.nix
     ./modules/themes
     ./modules/claude
+    ./modules/pi
     ./modules/granted
     ./modules/docker
   ];
@@ -51,6 +52,7 @@
   programs.ripgrep.enable = true;
   local.clojure.enable = true;
   local.claude.enable = true;
+  local.pi.enable = true;
   local.granted.enable = true;
   local.docker.enable = true;
 
