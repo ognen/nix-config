@@ -11,9 +11,11 @@
   home.homeDirectory = "/Users/oivanovs";
   home.stateVersion = "26.05"; # Please read the comment before changing.
 
-  # TODO hunspell emacs fonts (maocs defaults config, e.g. kbd repeat etc, )
+  # TODO hunspell emacs fonts
   imports = [
     ./modules/xdg-darwin.nix
+    ./modules/macos
+    ./modules/ghostty.nix
     ./modules/fish
     ./modules/nushell
     ./modules/starship
@@ -40,6 +42,8 @@
   xdg.enable = true;
 
   # Other programs and features
+  local.macos.enable = true;
+  local.ghostty.enable = true;
   local.nushell.enable = true;
   local.starship.enable = true;
   local.direnv.enable = true;
