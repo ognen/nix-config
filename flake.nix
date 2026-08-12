@@ -36,193 +36,146 @@
   outputs =
     inputs@{
       self,
-      nix-darwin,
       nixpkgs,
-      home-manager,
       ...
     }:
     let
-      system = "aarch64-darwin";
-      username = "oivanovs";
+      inherit (nixpkgs) lib;
 
-      # The flake's pkgs instance
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-
-        overlays = [
-          inputs.fh.overlays.default
-          inputs.llm-agents.overlays.shared-nixpkgs
-
-          (final: prev: {
-            tx-02-font = inputs.private-fonts.packages.${system}.TX-02;
-          })
-        ];
+      # Every machine this flake manages, with the user it is assigned to and
+      # that user's home-manager entry point. Adding a machine means adding an
+      # entry here plus a hosts/<name>/ directory — nothing else.
+      machines = {
+        mb5619 = {
+          system = "aarch64-darwin";
+          user = "oivanovs";
+          home = ./dotfiles/home.nix;
+        };
       };
+
+      # nixpkgs as this flake wants it, instantiated once per system and shared
+      # by every output that needs it.
+      pkgsBySystem = forAllSystems (
+        system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+
+          overlays = [
+            inputs.fh.overlays.default
+            inputs.llm-agents.overlays.shared-nixpkgs
+
+            (final: prev: {
+              tx-02-font = inputs.private-fonts.packages.${system}.TX-02;
+            })
+          ];
+        }
+      );
+
+      pkgsFor = system: pkgsBySystem.${system};
+
+      inherit
+        (import ./lib {
+          inherit
+            inputs
+            self
+            lib
+            pkgsFor
+            ;
+        })
+        mkDarwin
+        mkHome
+        ;
+
+      # The distinct systems the registry mentions.
+      forAllSystems = lib.genAttrs (
+        lib.unique (lib.mapAttrsToList (_: machine: machine.system) machines)
+      );
     in
     {
-      # This configuration is for machines where root access is
-      # not available w/o intervention.
-      darwinConfigurations."no-root" = nix-darwin.lib.darwinSystem {
-        inherit system pkgs;
-
-        modules = [
-          inputs.determinate.darwinModules.default
-          self.darwinModules.default
-        ];
-      };
-
+      # Keyed by hostname: `darwin-rebuild --flake .` looks up
+      # darwinConfigurations.$(scutil --get LocalHostName) and has no fallback.
       #
-      # A few system pacakges are installed and then the rest of them
-      # are managed by home-manager
-      darwinConfigurations."default" = nix-darwin.lib.darwinSystem {
-        inherit system pkgs;
+      # The "-no-root" variant is the same system without home-manager, for
+      # machines where root access is not available w/o intervention; apply the
+      # matching homeConfiguration alongside it.
+      darwinConfigurations = lib.concatMapAttrs (name: machine: {
+        ${name} = mkDarwin {
+          inherit name machine;
+          withHomeManager = true;
+        };
 
-        modules = [
-          inputs.determinate.darwinModules.default
-          self.darwinModules.default
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              backupFileExtension = "backup";
-              users.${username} = ./dotfiles/home.nix;
-            };
-          }
-        ];
-      };
+        "${name}-no-root" = mkDarwin {
+          inherit name machine;
+          withHomeManager = false;
+        };
+      }) machines;
 
-      # Standalone configuration for home manager, use it with
-      # the no-root darwin configuration
-      homeConfigurations."default" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
+      # Standalone home-manager, keyed "<user>@<host>" so that
+      # `home-manager switch --flake .` resolves without an argument.
+      homeConfigurations = lib.mapAttrs' (
+        name: machine:
+        lib.nameValuePair "${machine.user}@${name}" (mkHome {
+          inherit machine;
+        })
+      ) machines;
 
-        modules = [
-          ./dotfiles/home.nix
-        ];
-      };
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = pkgsFor system;
+        in
+        {
+          claudeCode = pkgs.callPackage ./dotfiles/modules/claude/package.nix { };
+          claudeCodeAcp = pkgs.callPackage ./dotfiles/modules/claude/acp.nix { };
+        }
+      );
 
-      packages.${system} = {
-        claudeCode = pkgs.callPackage ./dotfiles/modules/claude/package.nix { };
-        claudeCodeAcp = pkgs.callPackage ./dotfiles/modules/claude/acp.nix { };
-      };
-
-      darwinModules = {
-        base =
-          {
-            config,
-            pkgs,
-            lib,
-            ...
-          }:
-          {
-            system.configurationRevision = self.rev or self.dirtyRev or null;
-            # Used for backwards compatibility, please read the changelog before changing.
-            # $ darwin-rebuild changelog
-            system.stateVersion = 6;
-          };
-
-        nixConfig =
-          {
-            config,
-            pkg,
-            lib,
-            ...
-          }:
-          {
-            determinateNix = {
-              enable = true;
-              # Custom Determinate Nix settings written to /etc/nix/nix.custom.conf
-              customSettings = {
-                # Enables parallel evaluation (remove this setting or set the value to 1 to disable)
-                eval-cores = 0;
-                extra-experimental-features = [
-                  "build-time-fetch-tree" # Enables build-time flake inputs
-                  "parallel-eval" # Enables parallel evaluation
-                ];
-                # llm-agents.nix binary cache (pi and other AI coding agents)
-                extra-substituters = [ "https://cache.numtide.com" ];
-                extra-trusted-public-keys = [
-                  "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-                ];
-              };
-            };
-          };
-
-        users.oivanovs =
-          {
-            config,
-            pkg,
-            lib,
-            ...
-          }:
-          {
-            users.users.oivanovs = {
-              name = "oivanovs";
-              shell = pkgs.nushell;
-              home = "/Users/oivanovs";
-            };
-          };
-
-        default =
-          {
-            config,
-            pkg,
-            lib,
-            ...
-          }:
-          {
-            imports = [
-              self.darwinModules.base
-              self.darwinModules.nixConfig
-              ./hosts/default/configuration.nix
-              self.darwinModules.users.${username}
-            ];
-          };
-      };
-
-      devShells.${system}.default =
+      devShells = forAllSystems (
+        system:
         let
           pkgs = import inputs.nixpkgs { inherit system; };
         in
-        pkgs.mkShellNoCC {
-          packages = with pkgs; [
-            # Shell script for applying the nix-darwin configuration.
-            # Run this to apply the configuration in this flake to your macOS system.
-            (writeShellApplication {
-              name = "reload-nix-darwin-configuration";
-              runtimeInputs = [
-                # Make the darwin-rebuild package available in the script
-                inputs.nix-darwin.packages.${system}.darwin-rebuild
-              ];
-              text = ''
-                echo "> Applying nix-darwin configuration..."
+        {
+          default = pkgs.mkShellNoCC {
+            packages = with pkgs; [
+              # Shell script for applying the nix-darwin configuration.
+              # Run this to apply the configuration in this flake to your macOS system.
+              (writeShellApplication {
+                name = "reload-nix-darwin-configuration";
+                runtimeInputs = [
+                  # Make the darwin-rebuild package available in the script
+                  inputs.nix-darwin.packages.${system}.darwin-rebuild
+                ];
+                text = ''
+                  echo "> Applying nix-darwin configuration..."
 
-                echo "> Running darwin-rebuild switch as root..."
-                sudo darwin-rebuild switch --flake .
-                echo "> darwin-rebuild switch was successful ✅"
+                  echo "> Running darwin-rebuild switch as root..."
+                  sudo darwin-rebuild switch --flake .
+                  echo "> darwin-rebuild switch was successful ✅"
 
-                echo "> macOS config was successfully applied 🚀"
-              '';
-            })
-            (writeShellApplication {
-              name = "update-flake";
-              runtimeInputs = [ nushell ];
-              text = ''
-                echo "> Updating flake inputs..."
-                nix flake update
+                  echo "> macOS config was successfully applied 🚀"
+                '';
+              })
+              (writeShellApplication {
+                name = "update-flake";
+                runtimeInputs = [ nushell ];
+                text = ''
+                  echo "> Updating flake inputs..."
+                  nix flake update
 
-                echo "> Updating Claude Code..."
-                (cd dotfiles/modules/claude && nu ./update.nu)
+                  echo "> Updating Claude Code..."
+                  (cd dotfiles/modules/claude && nu ./update.nu)
 
-                echo "> Updating Claude Code ACP..."
-                (cd dotfiles/modules/claude && nu ./update-acp.nu)
+                  echo "> Updating Claude Code ACP..."
+                  (cd dotfiles/modules/claude && nu ./update-acp.nu)
 
-                echo "> All updates complete"
-              '';
-            })
-          ];
-        };
+                  echo "> All updates complete"
+                '';
+              })
+            ];
+          };
+        }
+      );
     };
 }

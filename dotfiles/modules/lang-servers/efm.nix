@@ -1,5 +1,6 @@
 {
   pkgs,
+  cacheHome,
 }:
 let
   pkg = pkgs.efm-langserver;
@@ -15,7 +16,7 @@ in
   configFiles = {
     "efm-langserver/config.yaml".text = ''
       version: 2
-      log-file: /Users/oivanovs/.cache/efm.log
+      log-file: ${cacheHome}/efm.log
       log-level: 1
       root-markers:
       - .git/

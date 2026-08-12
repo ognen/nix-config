@@ -8,6 +8,14 @@ let
   pkg = pkgs.nixd;
   formatter = pkgs.nixfmt;
   flake = "(builtins.getFlake ${flakePath})";
+  # The flake keys its configurations per machine (darwinConfigurations.<host>)
+  # and per user (homeConfigurations."<user>@<host>"), so there is no fixed name
+  # to point nixd at. Take the first entry instead: attrValues sorts by attribute
+  # name, and a host's plain name sorts before its own "<host>-no-root" variant,
+  # so this lands on a configuration that includes home-manager. With several
+  # machines it picks whichever host sorts first — good enough for the option
+  # completion this feeds. Evaluated lazily by nixd, not here.
+  firstConfigurationOf = output: "(builtins.head (builtins.attrValues ${flake}.${output}))";
 in
 rec {
   packages = [
@@ -21,8 +29,8 @@ rec {
     formatting.command = [ "${formatter}/bin/nixfmt" ];
 
     options = {
-      nixos.expr = "${flake}.inputs.darwinConfigurations.default.options";
-      home-manager.expr = "${flake}.homeConfigurations.default.options";
+      nixos.expr = "${firstConfigurationOf "darwinConfigurations"}.options";
+      home-manager.expr = "${firstConfigurationOf "homeConfigurations"}.options";
     };
   };
 

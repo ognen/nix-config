@@ -1,14 +1,11 @@
 {
   config,
   pkgs,
-  specialArgs,
   ...
 }:
 {
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
-  home.username = "oivanovs";
-  home.homeDirectory = "/Users/oivanovs";
+  # The user and the paths it should manage come from local.user, which is set
+  # from the machine registry in flake.nix (see dotfiles/modules/user.nix).
   home.stateVersion = "26.05"; # Please read the comment before changing.
 
   # TODO hunspell emacs fonts
