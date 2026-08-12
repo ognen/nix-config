@@ -51,6 +51,11 @@
           user = "oivanovs";
           home = ./dotfiles/home.nix;
         };
+	finrod = {
+	  system = "aarch64-darwin";
+	  user = "ognen";
+	  home = ./dotfiles/home.nix;
+ 	};
       };
 
       # nixpkgs as this flake wants it, instantiated once per system and shared
