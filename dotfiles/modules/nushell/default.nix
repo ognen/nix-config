@@ -65,7 +65,13 @@ in
           enable = true;
 
           environmentVariables = mkMerge [
-            config.home.sessionVariables
+            # home.sessionVariables is consumed by POSIX shells, so a value is
+            # allowed to reference other variables ("$VAR", "''${VAR:+:}") —
+            # home-manager's terminfo module writes TERMINFO_DIRS that way.
+            # Nushell performs no such expansion and would export the text
+            # verbatim, overwriting the correct value that
+            # /etc/nushell/nix-env.nu already put in the environment.
+            (lib.filterAttrs (_: v: !(lib.hasInfix "$" (toString v))) config.home.sessionVariables)
           ];
 
           extraEnv = ''

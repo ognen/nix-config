@@ -6,9 +6,13 @@ def parse-env-0 [] {
    | split column "=" name value
 }
 
+# `transpose --as-record` needs at least one row, so an empty table (which is
+# what the diff below produces when the script changes nothing) has to be
+# turned into an empty record by hand rather than an empty list.
 def as-record [] {
-  transpose  --header-row  --as-record 
-} 
+  let rows = $in
+  if ($rows | is-empty) { {} } else { $rows | transpose --header-row --as-record }
+}
 
 export def main [
   --shell (-s): string = /bin/bash
