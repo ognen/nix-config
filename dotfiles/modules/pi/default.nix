@@ -14,6 +14,9 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.llm-agents.pi ];
+    home.packages = [
+      pkgs.llm-agents.pi
+      pkgs.llm-agents.grok
+    ];
   };
 }
