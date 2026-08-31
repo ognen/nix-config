@@ -5,19 +5,18 @@
   ...
 }:
 let
+  inherit (lib) mkIf mkEnableOption;
   cfg = config.local.claude;
-  claudeCode = pkgs.callPackage ./package.nix { };
-  claudeCodeAcp = pkgs.callPackage ./acp.nix { };
 in
 {
   options.local.claude = {
-    enable = lib.mkEnableOption "claude";
+    enable = mkEnableOption "claude";
   };
 
-  config = lib.mkIf cfg.enable {
+  config = mkIf cfg.enable {
     home.packages = [
-      claudeCode
-      claudeCodeAcp
+      pkgs.llm-agents.claude-code
+      pkgs.llm-agents.claude-agent-acp
     ];
   };
 }

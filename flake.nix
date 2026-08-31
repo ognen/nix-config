@@ -125,17 +125,6 @@
         })
       ) machines;
 
-      packages = forAllSystems (
-        system:
-        let
-          pkgs = pkgsFor system;
-        in
-        {
-          claudeCode = pkgs.callPackage ./dotfiles/modules/claude/package.nix { };
-          claudeCodeAcp = pkgs.callPackage ./dotfiles/modules/claude/acp.nix { };
-        }
-      );
-
       devShells = forAllSystems (
         system:
         let
@@ -164,16 +153,9 @@
               })
               (writeShellApplication {
                 name = "update-flake";
-                runtimeInputs = [ nushell ];
                 text = ''
                   echo "> Updating flake inputs..."
                   nix flake update
-
-                  echo "> Updating Claude Code..."
-                  (cd dotfiles/modules/claude && nu ./update.nu)
-
-                  echo "> Updating Claude Code ACP..."
-                  (cd dotfiles/modules/claude && nu ./update-acp.nu)
 
                   echo "> All updates complete"
                 '';
