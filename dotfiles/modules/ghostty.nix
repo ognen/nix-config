@@ -36,7 +36,7 @@ in
         adjust-cell-height = "20%";
 
         macos-option-as-alt = "left";
-        macos-titlebar-style = "tabs";
+        macos-titlebar-style = "transparent";
 
         keybind = [ "shift+enter=text:\\x1b\\r" ];
       };
