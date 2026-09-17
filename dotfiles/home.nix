@@ -28,6 +28,7 @@
     ./modules/pi
     ./modules/granted
     ./modules/docker
+    ./modules/kubernetes
   ];
 
   # allow unree
@@ -56,6 +57,7 @@
   local.pi.enable = true;
   local.granted.enable = true;
   local.docker.enable = true;
+  local.kubernetes.enable = true;
 
   # Themes
   local.themes = {
