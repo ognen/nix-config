@@ -1,0 +1,21 @@
+{
+  "systems": {
+    "aarch64-darwin": {
+      "hash": "sha256-IM/VDAAM7QBQcYRsxl6qhTzSav+jBs/wOygy0R9XLak=",
+      "url": "https://github.com/CircleCI-Public/circleci-cli/releases/download/v1.5.0/circleci-cli_1.5.0_darwin_arm64.tar.gz"
+    },
+    "aarch64-linux": {
+      "hash": "sha256-QQsZxtkq+0LocxrCFz6srWfnknB7+/icoiL1UT/xueM=",
+      "url": "https://github.com/CircleCI-Public/circleci-cli/releases/download/v1.5.0/circleci-cli_1.5.0_linux_arm64.tar.gz"
+    },
+    "x86_64-darwin": {
+      "hash": "sha256-nJUWQU2XTwovJ4SxsWFzf6Kt5WITLAjvhaDAj/QjO7Q=",
+      "url": "https://github.com/CircleCI-Public/circleci-cli/releases/download/v1.5.0/circleci-cli_1.5.0_darwin_amd64.tar.gz"
+    },
+    "x86_64-linux": {
+      "hash": "sha256-ub1wwPvT9XOK6VDpOhHUZPFgzzk2Sxhs6mqU7SG6aC4=",
+      "url": "https://github.com/CircleCI-Public/circleci-cli/releases/download/v1.5.0/circleci-cli_1.5.0_linux_amd64.tar.gz"
+    }
+  },
+  "version": "1.5.0"
+}

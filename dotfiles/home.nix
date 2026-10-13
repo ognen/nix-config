@@ -29,6 +29,7 @@
     ./modules/granted
     ./modules/docker
     ./modules/kubernetes
+    ./modules/circleci
   ];
 
   # allow unree
@@ -58,6 +59,7 @@
   local.granted.enable = true;
   local.docker.enable = true;
   local.kubernetes.enable = true;
+  local.circleci.enable = true;
 
   # Themes
   local.themes = {

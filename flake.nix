@@ -152,10 +152,22 @@
                 '';
               })
               (writeShellApplication {
+                name = "update-circleci";
+                runtimeInputs = [
+                  curl
+                  jq
+                  git
+                ];
+                text = builtins.readFile ./dotfiles/modules/circleci/update.sh;
+              })
+              (writeShellApplication {
                 name = "update-flake";
                 text = ''
                   echo "> Updating flake inputs..."
                   nix flake update
+
+                  echo "> Updating pinned packages..."
+                  update-circleci
 
                   echo "> All updates complete"
                 '';
