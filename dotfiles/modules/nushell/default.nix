@@ -64,31 +64,6 @@ in
         nushell = {
           enable = true;
 
-          environmentVariables = mkMerge [
-            # home.sessionVariables is consumed by POSIX shells, so a value is
-            # allowed to reference other variables ("$VAR", "''${VAR:+:}") —
-            # home-manager's terminfo module writes TERMINFO_DIRS that way.
-            # Nushell performs no such expansion and would export the text
-            # verbatim, overwriting the correct value that
-            # /etc/nushell/nix-env.nu already put in the environment.
-            (lib.filterAttrs (_: v: !(lib.hasInfix "$" (toString v))) config.home.sessionVariables)
-          ];
-
-          extraEnv = ''
-            if ('/etc/nushell/nix-env.nu' | path exists) {
-              source /etc/nushell/nix-env.nu
-            }
-          '';
-
-          extraConfig = ''
-            use std/util 'path add'
-            let sessionPath = ${toNushell { } config.home.sessionPath};
-
-            if ($sessionPath | is-not-empty) {
-              path add ...$sessionPath
-            }
-          '';
-
           settings = {
             buffer_editor = "hx";
             show_banner = false;
@@ -101,6 +76,18 @@ in
         };
 
       };
+
+      # Load the nix-darwin system environment ahead of the session variables
+      # loader that loadSessionVariables puts at the top of env.nu: nix-darwin's
+      # set-environment replaces PATH and sets EDITOR, so running it afterwards
+      # would undo home.sessionPath and home.sessionVariables. Under nix-darwin
+      # the loader would load the system environment itself, so this only
+      # matters for the standalone home configuration.
+      home.file."${config.programs.nushell.configDir}/env.nu".text = lib.mkBefore ''
+        if ('/etc/nushell/nix-env.nu' | path exists) {
+          source /etc/nushell/nix-env.nu
+        }
+      '';
 
       home.packages = [
         pkgs.jc

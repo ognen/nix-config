@@ -6,7 +6,7 @@
 {
   # The user and the paths it should manage come from local.user, which is set
   # from the machine registry in flake.nix (see dotfiles/modules/user.nix).
-  home.stateVersion = "26.05"; # Please read the comment before changing.
+  home.stateVersion = "26.11"; # Please read the comment before changing.
 
   # TODO hunspell emacs fonts
   imports = [
@@ -31,9 +31,6 @@
     ./modules/kubernetes
     ./modules/circleci
   ];
-
-  # allow unree
-  nixpkgs.config.allowUnfree = true;
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
